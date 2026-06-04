@@ -77,9 +77,14 @@ export const viewPdf = async (req, res) => {
     if (!submission) {
       return res.status(404).json({ error: 'Submission not found' });
     }
+    
+    // RBAC Check
+    if (submission.userId !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Forbidden: Cannot view other users submissions' });
+    }
+
     res.json({ url: submission.file_url });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch PDF URL' });
   }
 };
-
