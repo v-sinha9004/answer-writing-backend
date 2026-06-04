@@ -1,10 +1,11 @@
 import express from 'express';
 import multer from 'multer';
+import os from 'os';
 import { uploadSubmission, getMySubmissions, getStats, viewPdf } from '../controllers/submissions.js';
 import { authenticate } from '../middlewares/auth.js';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: os.tmpdir() });
 
 router.use(authenticate);
 
