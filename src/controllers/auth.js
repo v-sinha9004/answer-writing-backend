@@ -23,10 +23,12 @@ export const login = async (req, res) => {
       expiresIn: '7d'
     });
 
+    const isProdOrSecure = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProdOrSecure,
+      sameSite: isProdOrSecure ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -44,7 +46,12 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie('token');
+  const isProdOrSecure = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProdOrSecure,
+    sameSite: isProdOrSecure ? 'none' : 'lax'
+  });
   res.json({ message: 'Logged out successfully' });
 };
 
